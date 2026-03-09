@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoinGrow</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+margin:0;
+background:#0b0215;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.screen{
+display:none;
+width:100%;
+max-width:420px;
+padding:25px;
+}
+
+.active{
+display:block;
+}
+
+.card{
+background:#1b0630;
+padding:25px;
+border-radius:15px;
+box-shadow:0 0 30px rgba(150,0,255,0.4);
+}
+
+h1{
+text-align:center;
+color:#bb6cff;
+margin-top:0;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:7px 0;
+border:none;
+border-radius:8px;
+background:#2d0d4f;
+color:white;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#bb6cff;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#9c3cff;
+}
+
+.secondary{
+background:#3c0c66;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.balance{
+font-size:18px;
+color:#00ffd5;
+}
+
+.notice{
+background:#2c0b4f;
+padding:12px;
+border-radius:10px;
+text-align:center;
+margin-top:10px;
+font-size:14px;
+}
+
+.progress{
+height:10px;
+background:#3d0c70;
+border-radius:10px;
+margin-top:10px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:#00ffd5;
+}
+
+.popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#1a0030;
+padding:25px;
+border-radius:15px;
+display:none;
+text-align:center;
+box-shadow:0 0 25px purple;
+}
+
+.toast{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,0,0,0.8);
+padding:12px 20px;
+border-radius:20px;
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="login">
+
+<div class="card">
+
+<h1>CoinGrow</h1>
+
+<div class="notice">
+Sistema automático de inversión USDT BEP20<br>
+Activa el potenciador y obtén ganancias en 12 días.
+</div>
+
+<input id="loginUser" placeholder="Usuario">
+<input id="loginPass" type="password" placeholder="Contraseña">
+
+<button onclick="login()">Iniciar sesión</button>
+<button class="secondary" onclick="show('register')">Registrarse</button>
+
+</div>
+</div>
+
+<!-- REGISTER -->
+<div class="screen" id="register">
+
+<div class="card">
+
+<h1>Registro</h1>
+
+<input id="rname" placeholder="Nombre">
+<input id="rlast" placeholder="Apellidos">
+<input id="remail" placeholder="Correo Gmail">
+<input id="ruser" placeholder="Usuario">
+<input id="rpass" type="password" placeholder="Contraseña">
+<input id="rpass2" type="password" placeholder="Confirmar contraseña">
+
+<button onclick="register()">Crear cuenta</button>
+<button class="secondary" onclick="show('login')">Volver</button>
+
+</div>
+</div>
+
+<!-- PANEL -->
+<div class="screen" id="panel">
+
+<div class="card">
+
+<div class="topbar">
+<div class="balance">Saldo: <span id="balance">0</span> USDT</div>
+<button onclick="logout()">Cerrar</button>
+</div>
+
+<div class="notice">
+USDT BEP20<br>
+0x3670a0bFfb8b8A6D42177807F8dFd369A3995b9e
+</div>
+
+<button onclick="showDeposit()">Depositar</button>
+<button onclick="startBooster()">Iniciar potenciador</button>
+<button onclick="withdraw()">Retirar</button>
+<button onclick="refer()">Refiere y gana</button>
+
+<div class="progress">
+<div class="progress-bar" id="progress"></div>
+</div>
+
+<div class="notice" id="boosterInfo">
+Potenciador inactivo
+</div>
+
+</div>
+</div>
+
+<!-- DEPOSIT -->
+<div class="screen" id="deposit">
+
+<div class="card">
+
+<h1>Depositar</h1>
+
+<input id="amount" type="number" min="0.8" placeholder="Cantidad USDT (mínimo 0.8)">
+
+<button onclick="confirmDeposit()">Confirmar</button>
+<button class="secondary" onclick="show('panel')">Volver</button>
+
+</div>
+</div>
+
+<!-- HASH -->
+<div class="screen" id="hash">
+
+<div class="card">
+
+<h1>Validar depósito</h1>
+
+<input id="txhash" placeholder="Hash de transacción">
+
+<button onclick="finishDeposit()">Confirmar</button>
+
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+
+let currentUser=null
+
+function show(id){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
+document.getElementById(id).classList.add("active")
+}
+
+function register(){
+
+if(rpass.value!==rpass2.value){
+alert("Contraseñas no coinciden")
+return
+}
+
+let user={
+name:rname.value,
+last:rlast.value,
+email:remail.value,
+user:ruser.value,
+pass:rpass.value,
+balance:0,
+deposit:0,
+booster:false,
+start:null
+}
+
+localStorage.setItem("user_"+user.user,JSON.stringify(user))
+
+alert("Registro completado")
+
+show("login")
+
+}
+
+function login(){
+
+let data=localStorage.getItem("user_"+loginUser.value)
+
+if(!data){
+alert("Usuario no existe")
+return
+}
+
+data=JSON.parse(data)
+
+if(data.pass!==loginPass.value){
+alert("Contraseña incorrecta")
+return
+}
+
+currentUser=data
+
+updateUI()
+
+show("panel")
+
+}
+
+function logout(){
+
+currentUser=null
+show("login")
+
+}
+
+function updateUI(){
+
+balance.innerText=currentUser.balance.toFixed(2)
+
+if(currentUser.booster){
+
+let start=new Date(currentUser.start)
+let end=new Date(start.getTime()+12*24*60*60*1000)
+
+let now=new Date()
+
+let progress=((now-start)/(end-start))*100
+
+if(progress>100)progress=100
+
+document.getElementById("progress").style.width=progress+"%"
+
+boosterInfo.innerHTML="Retiro disponible: "+end.toLocaleDateString()
+
+}else{
+
+document.getElementById("progress").style.width="0%"
+boosterInfo.innerHTML="Potenciador inactivo"
+
+}
+
+}
+
+function showDeposit(){
+show("deposit")
+}
+
+function confirmDeposit(){
+
+let amt=parseFloat(amount.value)
+
+if(amt<0.8){
+alert("Depósito mínimo 0.8")
+return
+}
+
+currentUser.deposit=amt
+
+show("hash")
+
+}
+
+function finishDeposit(){
+
+if(txhash.value.length<6){
+alert("Hash inválido")
+return
+}
+
+currentUser.balance+=currentUser.deposit
+
+save()
+
+updateUI()
+
+popup("Depósito agregado correctamente")
+
+show("panel")
+
+}
+
+function startBooster(){
+
+if(currentUser.deposit<=0){
+popup("Debes depositar primero")
+return
+}
+
+if(currentUser.booster){
+popup("Potenciador activo")
+return
+}
+
+currentUser.booster=true
+currentUser.start=new Date()
+
+save()
+
+updateUI()
+
+let profit=currentUser.deposit*0.05
+
+let total=currentUser.deposit+profit
+
+let end=new Date(new Date().getTime()+12*24*60*60*1000)
+
+popup("Ganancia estimada "+total.toFixed(2)+" USDT<br>Retiro disponible "+end.toLocaleDateString())
+
+}
+
+function withdraw(){
+
+if(!currentUser.booster){
+popup("No hay inversión activa")
+return
+}
+
+let start=new Date(currentUser.start)
+let end=new Date(start.getTime()+12*24*60*60*1000)
+
+let now=new Date()
+
+if(now<end){
+popup("Podrás retirar el "+end.toLocaleDateString())
+return
+}
+
+let profit=currentUser.deposit*0.05
+
+currentUser.balance+=profit
+currentUser.deposit=0
+currentUser.booster=false
+
+save()
+
+updateUI()
+
+popup("Retiro completado")
+
+}
+
+function refer(){
+
+let link="https://coingrow.app/ref"
+
+navigator.clipboard.writeText(link)
+
+toast("Enlace copiado")
+
+setTimeout(()=>{
+
+currentUser.balance+=0.10
+
+save()
+
+updateUI()
+
+},120000)
+
+}
+
+function popup(text){
+
+let p=document.getElementById("popup")
+
+p.innerHTML=text
+
+p.style.display="block"
+
+setTimeout(()=>p.style.display="none",5000)
+
+}
+
+function toast(text){
+
+let t=document.getElementById("toast")
+
+t.innerText=text
+
+t.style.display="block"
+
+setTimeout(()=>t.style.display="none",3000)
+
+}
+
+function save(){
+
+localStorage.setItem("user_"+currentUser.user,JSON.stringify(currentUser))
+
+}
+
+</script>
+
+</body>
+</html>
