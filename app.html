@@ -26,7 +26,7 @@ height:100vh;
 display:none;
 width:100%;
 max-width:420px;
-padding:25px;
+padding:20px;
 }
 
 .active{
@@ -35,7 +35,7 @@ display:block;
 
 .card{
 background:#1b0630;
-padding:25px;
+padding:20px;
 border-radius:15px;
 box-shadow:0 0 30px rgba(150,0,255,0.4);
 }
@@ -49,7 +49,7 @@ margin-top:0;
 input{
 width:100%;
 padding:12px;
-margin:7px 0;
+margin:6px 0;
 border:none;
 border-radius:8px;
 background:#2d0d4f;
@@ -149,7 +149,7 @@ display:none;
 
 <div class="notice">
 Sistema automático de inversión USDT BEP20<br>
-Activa el potenciador y obtén ganancias en 12 días.
+Activa el potenciador y obtén ganancias en 7 días.
 </div>
 
 <input id="loginUser" placeholder="Usuario">
@@ -192,8 +192,12 @@ Activa el potenciador y obtén ganancias en 12 días.
 </div>
 
 <div class="notice">
-USDT BEP20<br>
+Dirección USDT BEP20<br>
 0x3670a0bFfb8b8A6D42177807F8dFd369A3995b9e
+</div>
+
+<div class="notice" id="investmentInfo">
+No tienes inversión activa
 </div>
 
 <button onclick="showDeposit()">Depositar</button>
@@ -201,12 +205,12 @@ USDT BEP20<br>
 <button onclick="withdraw()">Retirar</button>
 <button onclick="refer()">Refiere y gana</button>
 
-<div class="progress">
-<div class="progress-bar" id="progress"></div>
+<div class="notice">
+Comparte tu enlace de referido para ganar 0.10 USDT por cada usuario registrado
 </div>
 
-<div class="notice" id="boosterInfo">
-Potenciador inactivo
+<div class="progress">
+<div class="progress-bar" id="progress"></div>
 </div>
 
 </div>
@@ -318,22 +322,27 @@ balance.innerText=currentUser.balance.toFixed(2)
 if(currentUser.booster){
 
 let start=new Date(currentUser.start)
-let end=new Date(start.getTime()+12*24*60*60*1000)
+let end=new Date(start.getTime()+7*24*60*60*1000)
 
 let now=new Date()
 
 let progress=((now-start)/(end-start))*100
-
 if(progress>100)progress=100
 
 document.getElementById("progress").style.width=progress+"%"
 
-boosterInfo.innerHTML="Retiro disponible: "+end.toLocaleDateString()
+let profit=currentUser.deposit*0.30
+let total=currentUser.deposit+profit
+
+investmentInfo.innerHTML=
+"Inversión activa: "+currentUser.deposit.toFixed(2)+" USDT<br>"+
+"Ganancia estimada: "+total.toFixed(2)+" USDT<br>"+
+"Disponible el: "+end.toLocaleDateString()
 
 }else{
 
 document.getElementById("progress").style.width="0%"
-boosterInfo.innerHTML="Potenciador inactivo"
+investmentInfo.innerHTML="No tienes inversión activa"
 
 }
 
@@ -385,10 +394,11 @@ return
 }
 
 if(currentUser.booster){
-popup("Potenciador activo")
+popup("Ya tienes una inversión activa")
 return
 }
 
+currentUser.balance-=currentUser.deposit
 currentUser.booster=true
 currentUser.start=new Date()
 
@@ -396,13 +406,7 @@ save()
 
 updateUI()
 
-let profit=currentUser.deposit*0.05
-
-let total=currentUser.deposit+profit
-
-let end=new Date(new Date().getTime()+12*24*60*60*1000)
-
-popup("Ganancia estimada "+total.toFixed(2)+" USDT<br>Retiro disponible "+end.toLocaleDateString())
+popup("Potenciador iniciado correctamente")
 
 }
 
@@ -414,7 +418,7 @@ return
 }
 
 let start=new Date(currentUser.start)
-let end=new Date(start.getTime()+12*24*60*60*1000)
+let end=new Date(start.getTime()+7*24*60*60*1000)
 
 let now=new Date()
 
@@ -423,9 +427,10 @@ popup("Podrás retirar el "+end.toLocaleDateString())
 return
 }
 
-let profit=currentUser.deposit*0.05
+let profit=currentUser.deposit*0.30
+let total=currentUser.deposit+profit
 
-currentUser.balance+=profit
+currentUser.balance+=total
 currentUser.deposit=0
 currentUser.booster=false
 
@@ -433,7 +438,7 @@ save()
 
 updateUI()
 
-popup("Retiro completado")
+popup("Retiro completado: "+total.toFixed(2)+" USDT")
 
 }
 
@@ -443,7 +448,7 @@ let link="https://coingrow.app/ref"
 
 navigator.clipboard.writeText(link)
 
-toast("Enlace copiado")
+toast("Enlace copiado correctamente")
 
 setTimeout(()=>{
 
@@ -490,4 +495,4 @@ localStorage.setItem("user_"+currentUser.user,JSON.stringify(currentUser))
 </script>
 
 </body>
-</html>
+  </html>
