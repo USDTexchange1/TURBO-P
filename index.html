@@ -407,7 +407,14 @@ function initiateInvestment() {
     return;
   }
 
+  if (amt > currentUser.balance) {
+    alert("Saldo insuficiente");
+    return;
+  }
+
   currentUser.deposit = amt;
+  currentUser.balance -= amt;
+
   show("deposit");
 }
 
