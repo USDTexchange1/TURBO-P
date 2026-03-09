@@ -146,6 +146,24 @@ button:hover {
   display: none;
 }
 
+.whatsapp-btn {
+  width: 100%;
+  padding: 12px;
+  background: #25d366;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.whatsapp-btn:hover {
+  background: #128c7e;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -211,6 +229,11 @@ button:hover {
     <div class="progress">
       <div class="progress-bar" id="progress"></div>
     </div>
+
+    <!-- Soporte WhatsApp -->
+    <button class="whatsapp-btn" onclick="window.open('https://wa.me/+5353420021', '_blank')">
+      Soporte en WhatsApp
+    </button>
   </div>
 </div>
 
@@ -259,7 +282,8 @@ function register() {
     balance: 0,
     deposit: 0,
     booster: false,
-    start: null
+    start: null,
+    investments: []  // Nuevo campo para inversiones individuales
   };
 
   localStorage.setItem("user_" + user.user, JSON.stringify(user));
@@ -302,7 +326,6 @@ function updateUI() {
   if (currentUser.booster) {
     let start = new Date(currentUser.start);
     let end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
-
     let now = new Date();
 
     let progress = ((now - start) / (end - start)) * 100;
@@ -321,6 +344,26 @@ function updateUI() {
     document.getElementById("progress").style.width = "0%";
     investmentInfo.innerHTML = "No tienes inversión activa";
   }
+
+  // Mostrar las inversiones individuales
+  currentUser.investments.forEach((inv, index) => {
+    let invProgress = ((new Date() - inv.start) / (inv.end - inv.start)) * 100;
+    invProgress = invProgress > 100 ? 100 : invProgress;
+    
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+    progressBar.style.width = invProgress + "%";
+
+    let invDiv = document.createElement("div");
+    invDiv.className = "notice";
+    invDiv.innerHTML = `
+      Inversión #${index + 1}: ${inv.amount} USDT<br>
+      Progreso: ${invProgress.toFixed(2)}%<br>
+      Finaliza el: ${inv.end.toLocaleDateString()}
+    `;
+    invDiv.appendChild(progressBar);
+    document.getElementById("panel").appendChild(invDiv);
+  });
 }
 
 function showDeposit() {
@@ -347,7 +390,6 @@ function finishDeposit() {
   }
 
   currentUser.balance += currentUser.deposit;
-
   save();
 
   updateUI();
@@ -371,6 +413,13 @@ function startBooster() {
   currentUser.balance -= currentUser.deposit;
   currentUser.booster = true;
   currentUser.start = new Date();
+
+  // Guardar la inversión activa como una inversión individual
+  currentUser.investments.push({
+    amount: currentUser.deposit,
+    start: currentUser.start,
+    end: new Date(currentUser.start.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 días
+  });
 
   save();
 
@@ -444,8 +493,7 @@ function toast(text) {
 function save() {
   localStorage.setItem("user_" + currentUser.user, JSON.stringify(currentUser));
 }
-
 </script>
 
 </body>
-  </html>
+      </html>
