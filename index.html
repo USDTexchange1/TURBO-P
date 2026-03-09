@@ -275,6 +275,19 @@ function show(id) {
   document.getElementById(id).classList.add("active");
 }
 
+// Restaurar sesión al recargar la página
+window.onload = function() {
+  const loggedUser = localStorage.getItem('loggedUser');
+  if (loggedUser) {
+    let data = localStorage.getItem("user_" + loggedUser);
+    if (data) {
+      currentUser = JSON.parse(data);
+      updateUI();
+      show("panel"); // Redirigir al panel principal
+    }
+  }
+};
+
 function register() {
   if (rpass.value !== rpass2.value) {
     alert("Contraseñas no coinciden");
@@ -321,10 +334,14 @@ function login() {
   updateUI();
 
   show("panel");
+
+  // Guardar la sesión activa
+  localStorage.setItem('loggedUser', currentUser.user);
 }
 
 function logout() {
   currentUser = null;
+  localStorage.removeItem('loggedUser');
   show("login");
 }
 
@@ -467,4 +484,4 @@ function save() {
 </script>
 
 </body>
-  </html>
+    </html>
