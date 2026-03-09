@@ -1,178 +1,177 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoinGrow</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoinGrow</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-<style>
-* {
-  box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
-}
+    body {
+      margin: 0;
+      background: #0b0215;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
 
-body {
-  margin: 0;
-  background: #0b0215;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
 
-.screen {
-  display: none;
-  width: 100%;
-  max-width: 420px;
-  padding: 20px;
-  opacity: 0;
-  animation: fadeIn 0.5s forwards;
-}
+    .active {
+      display: block;
+    }
 
-.active {
-  display: block;
-}
+    .card {
+      background: #1b0630;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(150, 0, 255, 0.4);
+    }
 
-.card {
-  background: #1b0630;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(150, 0, 255, 0.4);
-}
+    h1 {
+      text-align: center;
+      color: #bb6cff;
+      margin-top: 0;
+      font-size: 32px;
+    }
 
-h1 {
-  text-align: center;
-  color: #bb6cff;
-  margin-top: 0;
-  font-size: 32px;
-}
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 8px;
+      background: #2d0d4f;
+      color: white;
+      transition: all 0.3s ease;
+    }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0;
-  border: none;
-  border-radius: 8px;
-  background: #2d0d4f;
-  color: white;
-  transition: all 0.3s ease;
-}
+    input:focus {
+      background: #3b1c6b;
+    }
 
-input:focus {
-  background: #3b1c6b;
-}
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #bb6cff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #bb6cff;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+    button:hover {
+      background: #9c3cff;
+    }
 
-button:hover {
-  background: #9c3cff;
-}
+    .secondary {
+      background: #3c0c66;
+    }
 
-.secondary {
-  background: #3c0c66;
-}
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
 
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
+    .balance {
+      font-size: 18px;
+      color: #00ffd5;
+    }
 
-.balance {
-  font-size: 18px;
-  color: #00ffd5;
-}
+    .notice {
+      background: #2c0b4f;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
 
-.notice {
-  background: #2c0b4f;
-  padding: 12px;
-  border-radius: 10px;
-  text-align: center;
-  margin-top: 10px;
-  font-size: 14px;
-}
+    .progress {
+      height: 10px;
+      background: #3d0c70;
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
 
-.progress {
-  height: 10px;
-  background: #3d0c70;
-  border-radius: 10px;
-  margin-top: 10px;
-  overflow: hidden;
-}
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00ffd5;
+      transition: width 0.5s ease;
+    }
 
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: #00ffd5;
-  transition: width 0.5s ease;
-}
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a0030;
+      padding: 25px;
+      border-radius: 15px;
+      display: none;
+      text-align: center;
+      box-shadow: 0 0 25px purple;
+    }
 
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #1a0030;
-  padding: 25px;
-  border-radius: 15px;
-  display: none;
-  text-align: center;
-  box-shadow: 0 0 25px purple;
-}
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 12px 20px;
+      border-radius: 20px;
+      display: none;
+    }
 
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  padding: 12px 20px;
-  border-radius: 20px;
-  display: none;
-}
+    .whatsapp-btn {
+      width: 100%;
+      padding: 12px;
+      background: #25d366;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+    }
 
-.whatsapp-btn {
-  width: 100%;
-  padding: 12px;
-  background: #25d366;
-  color: white;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-}
+    .whatsapp-btn:hover {
+      background: #128c7e;
+    }
 
-.whatsapp-btn:hover {
-  background: #128c7e;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-</style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -484,4 +483,4 @@ function save() {
 </script>
 
 </body>
-  </html>
+    </html>
