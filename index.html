@@ -219,9 +219,7 @@ button:hover {
       0x3670a0bFfb8b8A6D42177807F8dFd369A3995b9e
     </div>
     <div class="notice" id="investmentInfo">No tienes inversión activa</div>
-    <button onclick="showDeposit()">Depositar</button>
-    <button onclick="startBooster()">Iniciar potenciador</button>
-    <button onclick="withdraw()">Retirar</button>
+    <button onclick="showInvestmentSystem()">Sistema de Inversión</button>
     <button onclick="refer()">Refiere y gana</button>
     <div class="notice">
       Comparte tu enlace de referido para ganar 0.10 USDT por cada usuario registrado
@@ -237,13 +235,23 @@ button:hover {
   </div>
 </div>
 
+<!-- SYSTEM INVESTMENT PANEL -->
+<div class="screen" id="investmentSystem">
+  <div class="card">
+    <h1>Sistema de Inversión</h1>
+    <div id="investmentList"></div>
+    <button onclick="show('panel')">Volver</button>
+    <button onclick="initiateInvestment()">Iniciar Inversión</button>
+  </div>
+</div>
+
 <!-- DEPOSIT -->
 <div class="screen" id="deposit">
   <div class="card">
     <h1>Depositar</h1>
     <input id="amount" type="number" min="0.8" placeholder="Cantidad USDT (mínimo 0.8)">
     <button onclick="confirmDeposit()">Confirmar</button>
-    <button class="secondary" onclick="show('panel')">Volver</button>
+    <button class="secondary" onclick="show('investmentSystem')">Volver</button>
   </div>
 </div>
 
@@ -344,29 +352,43 @@ function updateUI() {
     document.getElementById("progress").style.width = "0%";
     investmentInfo.innerHTML = "No tienes inversión activa";
   }
+}
 
-  // Mostrar las inversiones individuales
+function showInvestmentSystem() {
+  show("investmentSystem");
+  displayInvestments();
+}
+
+function displayInvestments() {
+  const investmentList = document.getElementById("investmentList");
+  investmentList.innerHTML = '';
+
   currentUser.investments.forEach((inv, index) => {
-    let invProgress = ((new Date() - inv.start) / (inv.end - inv.start)) * 100;
-    invProgress = invProgress > 100 ? 100 : invProgress;
-    
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar";
-    progressBar.style.width = invProgress + "%";
+    const progress = ((new Date() - inv.start) / (inv.end - inv.start)) * 100;
+    const progressBar = `<div class="progress-bar" style="width:${Math.min(progress, 100)}%"></div>`;
 
-    let invDiv = document.createElement("div");
-    invDiv.className = "notice";
-    invDiv.innerHTML = `
+    const investmentDiv = document.createElement('div');
+    investmentDiv.className = 'notice';
+    investmentDiv.innerHTML = `
       Inversión #${index + 1}: ${inv.amount} USDT<br>
-      Progreso: ${invProgress.toFixed(2)}%<br>
+      Progreso: ${progress.toFixed(2)}%<br>
+      Ganancia estimada: ${(inv.amount * 0.30).toFixed(2)} USDT<br>
       Finaliza el: ${inv.end.toLocaleDateString()}
     `;
-    invDiv.appendChild(progressBar);
-    document.getElementById("panel").appendChild(invDiv);
+    investmentDiv.appendChild(progressBar);
+    investmentList.appendChild(investmentDiv);
   });
 }
 
-function showDeposit() {
+function initiateInvestment() {
+  const amt = parseFloat(amount.value);
+
+  if (amt < 0.8) {
+    alert("Depósito mínimo 0.8");
+    return;
+  }
+
+  currentUser.deposit = amt;
   show("deposit");
 }
 
@@ -389,7 +411,15 @@ function finishDeposit() {
     return;
   }
 
-  currentUser.balance += currentUser.deposit;
+  // Guardar la inversión activa como una inversión individual
+  currentUser.investments.push({
+    amount: currentUser.deposit,
+    start: new Date(),
+    end: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // 7 días
+  });
+
+  currentUser.balance -= currentUser.deposit;
+
   save();
 
   updateUI();
@@ -397,65 +427,6 @@ function finishDeposit() {
   popup("Depósito agregado correctamente");
 
   show("panel");
-}
-
-function startBooster() {
-  if (currentUser.deposit <= 0) {
-    popup("Debes depositar primero");
-    return;
-  }
-
-  if (currentUser.booster) {
-    popup("Ya tienes una inversión activa");
-    return;
-  }
-
-  currentUser.balance -= currentUser.deposit;
-  currentUser.booster = true;
-  currentUser.start = new Date();
-
-  // Guardar la inversión activa como una inversión individual
-  currentUser.investments.push({
-    amount: currentUser.deposit,
-    start: currentUser.start,
-    end: new Date(currentUser.start.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 días
-  });
-
-  save();
-
-  updateUI();
-
-  popup("Potenciador iniciado correctamente");
-}
-
-function withdraw() {
-  if (!currentUser.booster) {
-    popup("No hay inversión activa");
-    return;
-  }
-
-  let start = new Date(currentUser.start);
-  let end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-  let now = new Date();
-
-  if (now < end) {
-    popup("Podrás retirar el " + end.toLocaleDateString());
-    return;
-  }
-
-  let profit = currentUser.deposit * 0.30;
-  let total = currentUser.deposit + profit;
-
-  currentUser.balance += total;
-  currentUser.deposit = 0;
-  currentUser.booster = false;
-
-  save();
-
-  updateUI();
-
-  popup("Retiro completado: " + total.toFixed(2) + " USDT");
 }
 
 function refer() {
@@ -496,4 +467,4 @@ function save() {
 </script>
 
 </body>
-      </html>
+  </html>
