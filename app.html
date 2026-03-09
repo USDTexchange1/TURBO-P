@@ -1,498 +1,496 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoinGrow</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoinGrow</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-<style>
+    body {
+      margin: 0;
+      background: #0b0215;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
 
-*{
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
 
-body{
-margin:0;
-background:#0b0215;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
+    .active {
+      display: block;
+    }
 
-.screen{
-display:none;
-width:100%;
-max-width:420px;
-padding:20px;
-}
+    .card {
+      background: #1b0630;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(150, 0, 255, 0.4);
+    }
 
-.active{
-display:block;
-}
+    h1 {
+      text-align: center;
+      color: #bb6cff;
+      margin-top: 0;
+      font-size: 32px;
+    }
 
-.card{
-background:#1b0630;
-padding:20px;
-border-radius:15px;
-box-shadow:0 0 30px rgba(150,0,255,0.4);
-}
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 8px;
+      background: #2d0d4f;
+      color: white;
+      transition: all 0.3s ease;
+    }
 
-h1{
-text-align:center;
-color:#bb6cff;
-margin-top:0;
-}
+    input:focus {
+      background: #3b1c6b;
+    }
 
-input{
-width:100%;
-padding:12px;
-margin:6px 0;
-border:none;
-border-radius:8px;
-background:#2d0d4f;
-color:white;
-}
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #bb6cff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:8px;
-background:#bb6cff;
-color:white;
-font-weight:bold;
-cursor:pointer;
-}
+    button:hover {
+      background: #9c3cff;
+    }
 
-button:hover{
-background:#9c3cff;
-}
+    .secondary {
+      background: #3c0c66;
+    }
 
-.secondary{
-background:#3c0c66;
-}
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
 
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:15px;
-}
+    .balance {
+      font-size: 18px;
+      color: #00ffd5;
+    }
 
-.balance{
-font-size:18px;
-color:#00ffd5;
-}
+    .notice {
+      background: #2c0b4f;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
 
-.notice{
-background:#2c0b4f;
-padding:12px;
-border-radius:10px;
-text-align:center;
-margin-top:10px;
-font-size:14px;
-}
+    .progress {
+      height: 10px;
+      background: #3d0c70;
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
 
-.progress{
-height:10px;
-background:#3d0c70;
-border-radius:10px;
-margin-top:10px;
-overflow:hidden;
-}
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00ffd5;
+      transition: width 0.5s ease;
+    }
 
-.progress-bar{
-height:100%;
-width:0%;
-background:#00ffd5;
-}
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a0030;
+      padding: 25px;
+      border-radius: 15px;
+      display: none;
+      text-align: center;
+      box-shadow: 0 0 25px purple;
+    }
 
-.popup{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#1a0030;
-padding:25px;
-border-radius:15px;
-display:none;
-text-align:center;
-box-shadow:0 0 25px purple;
-}
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 12px 20px;
+      border-radius: 20px;
+      display: none;
+    }
 
-.toast{
-position:fixed;
-bottom:30px;
-left:50%;
-transform:translateX(-50%);
-background:rgba(0,0,0,0.8);
-padding:12px 20px;
-border-radius:20px;
-display:none;
-}
+    .whatsapp-btn {
+      width: 100%;
+      padding: 12px;
+      background: #25d366;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+    }
 
-</style>
+    .whatsapp-btn:hover {
+      background: #128c7e;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
 <div class="screen active" id="login">
-
-<div class="card">
-
-<h1>CoinGrow</h1>
-
-<div class="notice">
-Sistema automático de inversión USDT BEP20<br>
-Activa el potenciador y obtén ganancias en 7 días.
-</div>
-
-<input id="loginUser" placeholder="Usuario">
-<input id="loginPass" type="password" placeholder="Contraseña">
-
-<button onclick="login()">Iniciar sesión</button>
-<button class="secondary" onclick="show('register')">Registrarse</button>
-
-</div>
+  <div class="card">
+    <h1>CoinGrow</h1>
+    <div class="notice">
+      Sistema automático de inversión USDT BEP20<br>
+      Activa el potenciador y obtén ganancias en 7 días.
+    </div>
+    <input id="loginUser" placeholder="Usuario">
+    <input id="loginPass" type="password" placeholder="Contraseña">
+    <button onclick="login()">Iniciar sesión</button>
+    <button class="secondary" onclick="show('register')">Registrarse</button>
+  </div>
 </div>
 
 <!-- REGISTER -->
 <div class="screen" id="register">
-
-<div class="card">
-
-<h1>Registro</h1>
-
-<input id="rname" placeholder="Nombre">
-<input id="rlast" placeholder="Apellidos">
-<input id="remail" placeholder="Correo Gmail">
-<input id="ruser" placeholder="Usuario">
-<input id="rpass" type="password" placeholder="Contraseña">
-<input id="rpass2" type="password" placeholder="Confirmar contraseña">
-
-<button onclick="register()">Crear cuenta</button>
-<button class="secondary" onclick="show('login')">Volver</button>
-
-</div>
+  <div class="card">
+    <h1>Registro</h1>
+    <input id="rname" placeholder="Nombre">
+    <input id="rlast" placeholder="Apellidos">
+    <input id="remail" placeholder="Correo Gmail">
+    <input id="ruser" placeholder="Usuario">
+    <input id="rpass" type="password" placeholder="Contraseña">
+    <input id="rpass2" type="password" placeholder="Confirmar contraseña">
+    <button onclick="register()">Crear cuenta</button>
+    <button class="secondary" onclick="show('login')">Volver</button>
+  </div>
 </div>
 
 <!-- PANEL -->
 <div class="screen" id="panel">
+  <div class="card">
+    <div class="topbar">
+      <div class="balance">Saldo: <span id="balance">0</span> USDT</div>
+      <button onclick="logout()">Cerrar</button>
+    </div>
+    <div class="notice">
+      Dirección USDT BEP20<br>
+      0x3670a0bFfb8b8A6D42177807F8dFd369A3995b9e
+    </div>
+    <div class="notice" id="investmentInfo">No tienes inversión activa</div>
+    <button onclick="showInvestmentSystem()">Sistema de Inversión</button>
+    <button onclick="refer()">Refiere y gana</button>
+    <div class="notice">
+      Comparte tu enlace de referido para ganar 0.10 USDT por cada usuario registrado
+    </div>
+    <div class="progress">
+      <div class="progress-bar" id="progress"></div>
+    </div>
 
-<div class="card">
+    <!-- Soporte WhatsApp -->
+    <button class="whatsapp-btn" onclick="window.open('https://wa.me/+5353420021', '_blank')">
+      Soporte en WhatsApp
+    </button>
 
-<div class="topbar">
-<div class="balance">Saldo: <span id="balance">0</span> USDT</div>
-<button onclick="logout()">Cerrar</button>
+    <!-- Agregar saldo -->
+    <button class="secondary" onclick="show('deposit')">Agregar saldo</button>
+  </div>
 </div>
 
-<div class="notice">
-Dirección USDT BEP20<br>
-0x3670a0bFfb8b8A6D42177807F8dFd369A3995b9e
-</div>
-
-<div class="notice" id="investmentInfo">
-No tienes inversión activa
-</div>
-
-<button onclick="showDeposit()">Depositar</button>
-<button onclick="startBooster()">Iniciar potenciador</button>
-<button onclick="withdraw()">Retirar</button>
-<button onclick="refer()">Refiere y gana</button>
-
-<div class="notice">
-Comparte tu enlace de referido para ganar 0.10 USDT por cada usuario registrado
-</div>
-
-<div class="progress">
-<div class="progress-bar" id="progress"></div>
-</div>
-
-</div>
+<!-- SYSTEM INVESTMENT PANEL -->
+<div class="screen" id="investmentSystem">
+  <div class="card">
+    <h1>Sistema de Inversión</h1>
+    <div id="investmentList"></div>
+    <button onclick="show('panel')">Volver</button>
+    <button onclick="initiateInvestment()">Iniciar Inversión</button>
+  </div>
 </div>
 
 <!-- DEPOSIT -->
 <div class="screen" id="deposit">
-
-<div class="card">
-
-<h1>Depositar</h1>
-
-<input id="amount" type="number" min="0.8" placeholder="Cantidad USDT (mínimo 0.8)">
-
-<button onclick="confirmDeposit()">Confirmar</button>
-<button class="secondary" onclick="show('panel')">Volver</button>
-
-</div>
+  <div class="card">
+    <h1>Depositar</h1>
+    <input id="amount" type="number" min="0.8" placeholder="Cantidad USDT (mínimo 0.8)">
+    <button onclick="confirmDeposit()">Confirmar</button>
+    <button class="secondary" onclick="show('investmentSystem')">Volver</button>
+  </div>
 </div>
 
 <!-- HASH -->
 <div class="screen" id="hash">
-
-<div class="card">
-
-<h1>Validar depósito</h1>
-
-<input id="txhash" placeholder="Hash de transacción">
-
-<button onclick="finishDeposit()">Confirmar</button>
-
-</div>
+  <div class="card">
+    <h1>Validar depósito</h1>
+    <input id="txhash" placeholder="Hash de transacción">
+    <button onclick="finishDeposit()">Confirmar</button>
+  </div>
 </div>
 
 <div class="popup" id="popup"></div>
 <div class="toast" id="toast"></div>
 
 <script>
+let currentUser = null;
 
-let currentUser=null
-
-function show(id){
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
-document.getElementById(id).classList.add("active")
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
-function register(){
+// Restaurar sesión al recargar la página
+window.onload = function() {
+  const loggedUser = localStorage.getItem('loggedUser');
+  if (loggedUser) {
+    let data = localStorage.getItem("user_" + loggedUser);
+    if (data) {
+      currentUser = JSON.parse(data);
+      updateUI();
+      show("panel"); // Redirigir al panel principal
+    }
+  }
+};
 
-if(rpass.value!==rpass2.value){
-alert("Contraseñas no coinciden")
-return
+function register() {
+  if (rpass.value !== rpass2.value) {
+    alert("Contraseñas no coinciden");
+    return;
+  }
+
+  let user = {
+    name: rname.value,
+    last: rlast.value,
+    email: remail.value,
+    user: ruser.value,
+    pass: rpass.value,
+    balance: 0,
+    deposit: 0,
+    booster: false,
+    start: null,
+    investments: []  // Nuevo campo para inversiones individuales
+  };
+
+  localStorage.setItem("user_" + user.user, JSON.stringify(user));
+
+  alert("Registro completado");
+
+  show("login");
 }
 
-let user={
-name:rname.value,
-last:rlast.value,
-email:remail.value,
-user:ruser.value,
-pass:rpass.value,
-balance:0,
-deposit:0,
-booster:false,
-start:null
+function login() {
+  let data = localStorage.getItem("user_" + loginUser.value);
+
+  if (!data) {
+    alert("Usuario no existe");
+    return;
+  }
+
+  data = JSON.parse(data);
+
+  if (data.pass !== loginPass.value) {
+    alert("Contraseña incorrecta");
+    return;
+  }
+
+  currentUser = data;
+
+  updateUI();
+
+  show("panel");
+
+  // Guardar la sesión activa
+  localStorage.setItem('loggedUser', currentUser.user);
 }
 
-localStorage.setItem("user_"+user.user,JSON.stringify(user))
-
-alert("Registro completado")
-
-show("login")
-
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('loggedUser');
+  show("login");
 }
 
-function login(){
+function updateUI() {
+  balance.innerText = currentUser.balance.toFixed(2);
 
-let data=localStorage.getItem("user_"+loginUser.value)
+  if (currentUser.booster) {
+    let start = new Date(currentUser.start);
+    let end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+    let now = new Date();
 
-if(!data){
-alert("Usuario no existe")
-return
+    let progress = ((now - start) / (end - start)) * 100;
+    if (progress > 100) progress = 100;
+
+    document.getElementById("progress").style.width = progress + "%";
+
+    let profit = currentUser.deposit * 0.30;
+    let total = currentUser.deposit + profit;
+
+    investmentInfo.innerHTML =
+      "Inversión activa: " + currentUser.deposit.toFixed(2) + " USDT<br>" +
+      "Ganancia estimada: " + total.toFixed(2) + " USDT<br>" +
+      "Disponible el: " + end.toLocaleDateString();
+  } else {
+    document.getElementById("progress").style.width = "0%";
+    investmentInfo.innerHTML = "No tienes inversión activa";
+  }
 }
 
-data=JSON.parse(data)
-
-if(data.pass!==loginPass.value){
-alert("Contraseña incorrecta")
-return
+function showInvestmentSystem() {
+  show("investmentSystem");
+  displayInvestments();
 }
 
-currentUser=data
+function displayInvestments() {
+  const investmentList = document.getElementById("investmentList");
+  investmentList.innerHTML = '';
 
-updateUI()
+  currentUser.investments.forEach((inv, index) => {
+    const progress = ((new Date() - inv.start) / (inv.end - inv.start)) * 100;
+    const progressBar = `<div class="progress-bar" style="width:${Math.min(progress, 100)}%"></div>`;
 
-show("panel")
-
+    const investmentDiv = document.createElement('div');
+    investmentDiv.className = 'notice';
+    investmentDiv.innerHTML = `
+      Inversión #${index + 1}: ${inv.amount} USDT<br>
+      Progreso: ${progress.toFixed(2)}%<br>
+      Ganancia estimada: ${(inv.amount * 0.30).toFixed(2)} USDT<br>
+      Finaliza el: ${inv.end.toLocaleDateString()}
+    `;
+    investmentDiv.appendChild(progressBar);
+    investmentList.appendChild(investmentDiv);
+  });
 }
 
-function logout(){
+function initiateInvestment() {
+  const amt = parseFloat(amount.value);
 
-currentUser=null
-show("login")
+  if (amt < 0.8) {
+    alert("Depósito mínimo 0.8");
+    return;
+  }
 
+  if (amt > currentUser.balance) {
+    alert("Saldo insuficiente");
+    return;
+  }
+
+  currentUser.deposit = amt;
+  currentUser.balance -= amt;
+
+  show("deposit");
 }
 
-function updateUI(){
+function confirmDeposit() {
+  let amt = parseFloat(amount.value);
 
-balance.innerText=currentUser.balance.toFixed(2)
+  if (amt < 0.8) {
+    alert("Depósito mínimo 0.8");
+    return;
+  }
 
-if(currentUser.booster){
+  currentUser.deposit = amt;
 
-let start=new Date(currentUser.start)
-let end=new Date(start.getTime()+7*24*60*60*1000)
-
-let now=new Date()
-
-let progress=((now-start)/(end-start))*100
-if(progress>100)progress=100
-
-document.getElementById("progress").style.width=progress+"%"
-
-let profit=currentUser.deposit*0.30
-let total=currentUser.deposit+profit
-
-investmentInfo.innerHTML=
-"Inversión activa: "+currentUser.deposit.toFixed(2)+" USDT<br>"+
-"Ganancia estimada: "+total.toFixed(2)+" USDT<br>"+
-"Disponible el: "+end.toLocaleDateString()
-
-}else{
-
-document.getElementById("progress").style.width="0%"
-investmentInfo.innerHTML="No tienes inversión activa"
-
+  show("hash");
 }
 
+function finishDeposit() {
+  if (txhash.value.length < 6) {
+    alert("Hash inválido");
+    return;
+  }
+
+  // Guardar la inversión activa como una inversión individual
+  currentUser.investments.push({
+    amount: currentUser.deposit,
+    start: new Date(),
+    end: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // 7 días
+  });
+
+  currentUser.balance -= currentUser.deposit;
+
+  save();
+
+  updateUI();
+
+  popup("Depósito agregado correctamente");
+
+  show("panel");
 }
 
-function showDeposit(){
-show("deposit")
+function refer() {
+  let link = "https://usdtexchange1.github.io/TURBO-P/";
+
+  navigator.clipboard.writeText(link);
+
+  toast("Enlace copiado correctamente");
+
+  setTimeout(() => {
+    currentUser.balance += 0.10;
+    save();
+    updateUI();
+  }, 120000);
 }
 
-function confirmDeposit(){
+function popup(text) {
+  let p = document.getElementById("popup");
 
-let amt=parseFloat(amount.value)
+  p.innerHTML = text;
+  p.style.display = "block";
 
-if(amt<0.8){
-alert("Depósito mínimo 0.8")
-return
+  setTimeout(() => p.style.display = "none", 5000);
 }
 
-currentUser.deposit=amt
+function toast(text) {
+  let t = document.getElementById("toast");
 
-show("hash")
+  t.innerText = text;
+  t.style.display = "block";
 
+  setTimeout(() => t.style.display = "none", 3000);
 }
 
-function finishDeposit(){
-
-if(txhash.value.length<6){
-alert("Hash inválido")
-return
+function save() {
+  localStorage.setItem("user_" + currentUser.user, JSON.stringify(currentUser));
 }
-
-currentUser.balance+=currentUser.deposit
-
-save()
-
-updateUI()
-
-popup("Depósito agregado correctamente")
-
-show("panel")
-
-}
-
-function startBooster(){
-
-if(currentUser.deposit<=0){
-popup("Debes depositar primero")
-return
-}
-
-if(currentUser.booster){
-popup("Ya tienes una inversión activa")
-return
-}
-
-currentUser.balance-=currentUser.deposit
-currentUser.booster=true
-currentUser.start=new Date()
-
-save()
-
-updateUI()
-
-popup("Potenciador iniciado correctamente")
-
-}
-
-function withdraw(){
-
-if(!currentUser.booster){
-popup("No hay inversión activa")
-return
-}
-
-let start=new Date(currentUser.start)
-let end=new Date(start.getTime()+7*24*60*60*1000)
-
-let now=new Date()
-
-if(now<end){
-popup("Podrás retirar el "+end.toLocaleDateString())
-return
-}
-
-let profit=currentUser.deposit*0.30
-let total=currentUser.deposit+profit
-
-currentUser.balance+=total
-currentUser.deposit=0
-currentUser.booster=false
-
-save()
-
-updateUI()
-
-popup("Retiro completado: "+total.toFixed(2)+" USDT")
-
-}
-
-function refer(){
-
-let link="https://coingrow.app/ref"
-
-navigator.clipboard.writeText(link)
-
-toast("Enlace copiado correctamente")
-
-setTimeout(()=>{
-
-currentUser.balance+=0.10
-
-save()
-
-updateUI()
-
-},120000)
-
-}
-
-function popup(text){
-
-let p=document.getElementById("popup")
-
-p.innerHTML=text
-
-p.style.display="block"
-
-setTimeout(()=>p.style.display="none",5000)
-
-}
-
-function toast(text){
-
-let t=document.getElementById("toast")
-
-t.innerText=text
-
-t.style.display="block"
-
-setTimeout(()=>t.style.display="none",3000)
-
-}
-
-function save(){
-
-localStorage.setItem("user_"+currentUser.user,JSON.stringify(currentUser))
-
-}
-
 </script>
 
 </body>
-  </html>
+      </html>
